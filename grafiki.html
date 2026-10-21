@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Типы графиков и чем они отличаются — ТИК</title>
+<meta name="description" content="Девять типов биржевых графиков с примерами: линия, область, бары, японские свечи, Heikin Ashi, Ренко, крестики-нолики, профиль объёма и глубина рынка. Что каждый показывает и где врёт.">
+<meta name="theme-color" content="#090C10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090C10'/%3E%3Crect x='7' y='10' width='3' height='14' fill='%233FBF8F'/%3E%3Crect x='14' y='5' width='3' height='21' fill='%23F0614E'/%3E%3Crect x='21' y='13' width='3' height='12' fill='%233FBF8F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="index.html">
+      <svg class="brand-mark" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="none" stroke="#2B3947"/><rect x="3.5" y="7" width="2.2" height="9" fill="#3FBF8F"/><rect x="9" y="3" width="2.2" height="14" fill="#F0614E"/><rect x="14.3" y="9" width="2.2" height="8" fill="#3FBF8F"/></svg>
+      <span>ТИК<small>трейдинг без иллюзий</small></span>
+    </a>
+    <nav class="nav" aria-label="Разделы сайта">
+      <a href="index.html">Обзор</a>
+      <a href="osnovy.html">Основы</a>
+      <a href="grafiki.html" aria-current="page">Графики</a>
+      <a href="risk.html">Риск</a>
+      <a href="start.html">Старт</a>
+      <a href="realnost.html">Честно</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Глава 2 · визуализация цены</p>
+      <h1>Девять графиков, <span class="soft">девять разных правд</span></h1>
+      <p class="lede">График — это не рынок, а модель рынка. Каждый тип выбрасывает часть информации, чтобы показать другую. Ниже — один и тот же ценовой ряд, построенный девятью способами: переключайте вкладки и смотрите, как меняется картина.</p>
+      <div class="head-meta">
+        <span><i class="dot"></i>живые графики на canvas</span>
+        <span><i class="dot amber"></i>единые учебные данные</span>
+        <span><i class="dot red"></i>без биржевых API</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="lab rv" aria-label="Сравнение типов графиков">
+      <div class="lab-head" role="tablist" aria-label="Тип графика">
+        <button class="tab" role="tab" id="tab-line" aria-controls="lab-panel" aria-selected="false" data-type="line">Линия</button>
+        <button class="tab" role="tab" id="tab-area" aria-controls="lab-panel" aria-selected="false" data-type="area">Область</button>
+        <button class="tab" role="tab" id="tab-candles" aria-controls="lab-panel" aria-selected="true" data-type="candles">Свечи</button>
+        <button class="tab" role="tab" id="tab-bars" aria-controls="lab-panel" aria-selected="false" data-type="bars">Бары</button>
+        <button class="tab" role="tab" id="tab-heikin" aria-controls="lab-panel" aria-selected="false" data-type="heikin">Heikin Ashi</button>
+        <button class="tab" role="tab" id="tab-renko" aria-controls="lab-panel" aria-selected="false" data-type="renko">Ренко</button>
+        <button class="tab" role="tab" id="tab-pnf" aria-controls="lab-panel" aria-selected="false" data-type="pnf">Крестики-нолики</button>
+        <button class="tab" role="tab" id="tab-profile" aria-controls="lab-panel" aria-selected="false" data-type="profile">Профиль объёма</button>
+        <button class="tab" role="tab" id="tab-depth" aria-controls="lab-panel" aria-selected="false" data-type="depth">Глубина рынка</button>
+      </div>
+      <div class="lab-body" id="lab-panel" role="tabpanel" aria-labelledby="tab-candles" tabindex="0">
+        <div class="lab-canvas"><canvas id="lab-chart" aria-label="Учебный график выбранного типа" role="img"></canvas></div>
+        <div class="lab-info">
+          <p class="kicker" id="lab-kicker">Цена + время</p>
+          <h3 id="lab-title">Японские свечи</h3>
+          <p id="lab-what">Каждый элемент — четыре цены за период: открытие, максимум, минимум, закрытие. Тело показывает диапазон открытия-закрытия, тени — экстремумы внутри периода.</p>
+          <div class="lab-rows">
+            <div class="lab-row"><b>Сила</b><span id="lab-pro">Видно, кто победил внутри периода, есть визуальная оценка волатильности и «настроения».</span></div>
+            <div class="lab-row"><b>Слабость</b><span id="lab-con">Шум: на мелком таймфрейме красивые фигуры часто случайны. Требует трактовки, а не просто просмотра.</span></div>
+            <div class="lab-row"><b>Кому</b><span id="lab-who">Большинству частных трейдеров как основной инструмент.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <p class="small">Все девять графиков построены из одной серии из 150 учебных свечей. Расхождения в форме — не ошибка, а следствие разных правил построения.</p>
+  </div>
+
+  <div class="wrap split">
+    <aside class="rail" aria-label="Содержание страницы">
+      <div class="rail-inner">
+        <p class="rail-title">На этой странице</p>
+        <a href="#pochemu">Почему картинки разные</a>
+        <a href="#sravnenie">Сводная таблица</a>
+        <a href="#kak-vybrat">Как выбрать график</a>
+        <a href="#kombinacii">Рабочие комбинации</a>
+        <a href="#oshibki">Ошибки чтения</a>
+      </div>
+    </aside>
+
+    <main>
+      <section class="block rv" id="pochemu">
+        <p class="section-note">01 · теория</p>
+        <h2>Почему на разных графиках — разный рынок</h2>
+        <p>Любой график отвечает на три вопроса: <strong>что</strong> измеряется, <strong>как</strong> группируется и <strong>что выбрасывается</strong>. Разница между типами — это разница между компромиссами.</p>
+
+        <div class="grid c3">
+          <div class="cell"><span class="tag">По цене</span><h3>Одна точка вместо четырёх</h3><p>Линия и область берут только цену закрытия. Внутридневные колебания исчезают: график гладкий, но вы не видите, что цена ходила на 3% в обе стороны.</p></div>
+          <div class="cell"><span class="tag">По времени</span><h3>Равные интервалы</h3><p>Свечи и бары привязаны к календарю: одна свеча — один час или день. Тихий час и час паники занимают одинаковую ширину.</p></div>
+          <div class="cell"><span class="tag">По движению</span><h3>Равные шаги цены</h3><p>Ренко и крестики-нолики игнорируют время полностью: новый элемент появляется только при значимом движении. Время перестаёт быть осью.</p></div>
+          <div class="cell"><span class="tag">По объёму</span><h3>Где реально торговали</h3><p>Профиль объёма показывает, на каких уровнях сосредоточен оборот. Это ответ на вопрос «где у участников позиции», которого нет на свечах.</p></div>
+          <div class="cell"><span class="tag">По ликвидности</span><h3>Заявки, а не сделки</h3><p>Глубина рынка показывает несовершённые намерения: где стоят крупные заявки и насколько рынок тонкий в обе стороны.</p></div>
+          <div class="cell"><span class="tag">По сглаживанию</span><h3>Фильтр вместо факта</h3><p>Heikin Ashi усредняет цены. Тренд читается легче, но цена на графике не равна реальной — по ней нельзя ставить точный стоп.</p></div>
+        </div>
+      </section>
+
+      <section class="block rv" id="sravnenie">
+        <p class="section-note">02 · сравнение</p>
+        <h2>Сводная таблица</h2>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>График</th><th>Что использует</th><th>Сильная сторона</th><th>Слабая сторона</th><th>Горизонт</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Линия</td><td>цена закрытия</td><td>чистый тренд, минимум шума</td><td>нет волатильности и теней</td><td class="n">дни — месяцы</td></tr>
+              <tr><td>Область</td><td>цена закрытия + заливка</td><td>наглядно для отчётов и обзоров</td><td>та же потеря внутридневных данных</td><td class="n">дни — годы</td></tr>
+              <tr><td>Свечи</td><td>OHLC</td><td>баланс информации и читаемости</td><td>много ложных паттернов</td><td class="n">любой</td></tr>
+              <tr><td>Бары</td><td>OHLC</td><td>плотнее по ширине, привычны на Западе</td><td>менее наглядны, чем свечи</td><td class="n">любой</td></tr>
+              <tr><td>Heikin Ashi</td><td>средние OHLC</td><td>тренд виден без мелкого шума</td><td>цена искажена, стопы по ней неточны</td><td class="n">часы — дни</td></tr>
+              <tr><td>Ренко</td><td>только цена, шаг кирпича</td><td>нет шума, чёткие развороты</td><td>время и объём исчезают; входы запаздывают</td><td class="n">дни — недели</td></tr>
+              <tr><td>Крестики-нолики</td><td>цена, шаг + разворот</td><td>фильтр мелких движений, чистая структура</td><td>нет времени, объёма и точной цены</td><td class="n">недели — месяцы</td></tr>
+              <tr><td>Профиль объёма</td><td>объём по уровням цены</td><td>видны зоны интереса и POC</td><td>зависит от качества данных, нужен опыт</td><td class="n">дни — недели</td></tr>
+              <tr><td>Глубина рынка</td><td>заявки в стакане</td><td>ликвидность и крупные уровни</td><td>мгновенный снимок, легко манипулируется</td><td class="n">минуты — часы</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="block rv" id="kak-vybrat">
+        <p class="section-note">03 · выбор</p>
+        <h2>Как выбрать свой график</h2>
+        <p>Нет «лучшего» графика — есть подходящий вашей задаче. Ответьте на три вопроса, и выбор сузится сам.</p>
+
+        <ul class="steps">
+          <li>
+            <h3>Сколько времени вы держите позицию?</h3>
+            <p>Минуты и часы — свечи на M5–M15 с объёмом. Дни и недели — дневные свечи или бары, профиль объёма. Месяцы — линейный или недельный график: детали только мешают.</p>
+          </li>
+          <li>
+            <h3>Что именно вы ищете?</h3>
+            <p>Направление тренда — линия и старший таймфрейм. Точку входа — свечи на младшем. Уровни, где стоят крупные участники — профиль объёма. Отсутствие шума — Ренко.</p>
+          </li>
+          <li>
+            <h3>Сколько шума вы выдержите?</h3>
+            <p>Чем чище график, тем позже сигнал. Ренко и крестики-нолики избавляют от ложных движений, но вы входите уже после подтверждения. Свечи дают ранний вход и больше ложных срабатываний. Это один и тот же компромисс, просто с разных сторон.</p>
+          </li>
+        </ul>
+
+        <div class="callout">
+          <span class="lbl">Проверка на практике</span>
+          <p>Возьмите 30 завершённых сделок и отметьте, где вы вошли бы, глядя на каждый тип графика. Если на линиях и ренко ваши входы совпадают, а на свечах — нет, значит вы торгуете шум, а не структуру.</p>
+        </div>
+      </section>
+
+      <section class="block rv" id="kombinacii">
+        <p class="section-note">04 · рабочие связки</p>
+        <h2>Комбинации, которые не противоречат друг другу</h2>
+        <div class="grid c2">
+          <div class="cell"><span class="tag">Трендовая</span><h3>Дневные свечи + H1</h3><p>Направление определяете на дневном, вход и стоп — на часовом. Классика свинг-трейдинга: меньше сделок, крупнее цели.</p></div>
+          <div class="cell"><span class="tag">Внутридневная</span><h3>Свечи M15 + объём</h3><p>Уровни и объёмные всплески на M15, подтверждение на M5. Требует присутствия у экрана и жёсткого лимита сделок в день.</p></div>
+          <div class="cell"><span class="tag">Фильтр шума</span><h3>Свечи + Ренко</h3><p>Свечи для точной цены и стопа, Ренко — для проверки, есть ли вообще движение, а не дребезг.</p></div>
+          <div class="cell"><span class="tag">Уровни</span><h3>Профиль объёма + стакан</h3><p>Профиль показывает исторические зоны оборота, стакан — текущее скопление заявок. Совпадение — сильный ориентир, расхождение — повод не входить.</p></div>
+        </div>
+      </section>
+
+      <section class="block rv" id="oshibki">
+        <p class="section-note">05 · предупреждения</p>
+        <h2>Ошибки чтения графиков</h2>
+        <div class="grid c2">
+          <div class="cell"><span class="tag">Ошибка 1</span><h3>Вера в «фигуры» без статистики</h3><p>«Голова и плечи» или «треугольник» сами по себе ничего не гарантируют. Фигура — это описание, а не сигнал: проверяйте её на истории и считайте результат, а не узнаваемость.</p></div>
+          <div class="cell"><span class="tag">Ошибка 2</span><h3>Стоп по HA или Ренко</h3><p>На Heikin Ashi и Ренко нарисованная цена не совпадает с рыночной. Ставить стоп по такому графику — значит ставить его в другом месте, чем вы думаете.</p></div>
+          <div class="cell"><span class="tag">Ошибка 3</span><h3>Подгонка таймфрейма</h3><p>Перебор интервалов до тех пор, пока картинка не совпадёт с желанием, — это подгонка. Заранее фиксируйте таймфрейм и не меняйте его внутри сделки.</p></div>
+          <div class="cell"><span class="tag">Ошибка 4</span><h3>Игнорирование объёма</h3><p>Движение без объёма часто оказывается выносом. Свеча на тонком рынке и свеча на плотном выглядят одинаково, а значат разное.</p></div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Навигация между разделами">
+        <a href="osnovy.html"><span class="dir">Назад</span><span class="who">Глава 1 — Основы</span></a>
+        <a class="right" href="risk.html"><span class="dir">Дальше</span><span class="who">Глава 3 — Риск</span></a>
+      </nav>
+    </main>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>ТИК</h4>
+        <p>Учебный проект о том, как устроен трейдинг и чего он стоит на самом деле. Без сигналов, партнёрских ссылок и обещаний доходности.</p>
+      </div>
+      <div>
+        <h4>Разделы</h4>
+        <ul>
+          <li><a href="index.html">Обзор</a></li>
+          <li><a href="osnovy.html">Основы рынка</a></li>
+          <li><a href="risk.html">Риск и позиция</a></li>
+          <li><a href="start.html">Как начинать</a></li>
+          <li><a href="realnost.html">Стоит ли лезть</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Важно</h4>
+        <p>Графики построены на синтетических данных. Материалы не являются инвестиционной рекомендацией.</p>
+      </div>
+    </div>
+    <p class="foot-note">Учебная серия не является котировками реального инструмента. Типы графиков реализованы на canvas без внешних библиотек.</p>
+  </div>
+</footer>
+
+<script src="assets/charts.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var data = window.Charts.series(150, 42, 96);
+  var cv = document.getElementById("lab-chart");
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  var panel = document.getElementById("lab-panel");
+  var elKicker = document.getElementById("lab-kicker");
+  var elTitle = document.getElementById("lab-title");
+  var elWhat = document.getElementById("lab-what");
+  var elPro = document.getElementById("lab-pro");
+  var elCon = document.getElementById("lab-con");
+  var elWho = document.getElementById("lab-who");
+
+  var META = {
+    line: {
+      kicker: "Цена · без времени внутри",
+      title: "Линейный график",
+      what: "Каждая точка — цена закрытия периода, соединённая линией. Всё, что происходило внутри, отброшено.",
+      pro: "Тренд виден мгновенно, шума почти нет, легко сравнивать несколько инструментов на одном поле.",
+      con: "Не видно волатильности: день с диапазоном 5% и день с диапазоном 0,3% могут дать одинаковый отрезок.",
+      who: "Долгосрочные инвесторы, обзор рынка, сравнение активов."
+    },
+    area: {
+      kicker: "Цена · акцент на уровне",
+      title: "График с областью",
+      what: "Та же линия закрытий, но пространство под ней залито цветом. Фактически это линейный график с усиленной подачей.",
+      pro: "Быстро считывается «выше-ниже», хорошо работает в отчётах и презентациях.",
+      con: "Информации не больше, чем у линии. Заливка создаёт ложное ощущение объёма.",
+      who: "Отчёты, дашборды, публичные обзоры динамики."
+    },
+    candles: {
+      kicker: "Цена + время · OHLC",
+      title: "Японские свечи",
+      what: "Каждый элемент — четыре цены за период: открытие, максимум, минимум, закрытие. Тело — диапазон открытие-закрытие, тени — экстремумы.",
+      pro: "Видно, кто победил внутри периода, есть визуальная оценка волатильности и настроения. Универсальный стандарт.",
+      con: "Провоцирует поиск «паттернов», которые на статистике не работают. На мелких таймфреймах — почти чистый шум.",
+      who: "Большинству частных трейдеров как основной инструмент."
+    },
+    bars: {
+      kicker: "Цена + время · OHLC",
+      title: "Бары (OHLC)",
+      what: "Вертикальная черта от минимума к максимуму, слева насечка открытия, справа — закрытия.",
+      pro: "Компактнее свечей: на экран влезает больше истории, нет визуального «веса» тел.",
+      con: "Медленнее читается, направление периода не так очевидно, новичку труднее.",
+      who: "Тем, кто привык к западной школе и торгует плотно по истории."
+    },
+    heikin: {
+      kicker: "Сглаженная цена",
+      title: "Heikin Ashi",
+      what: "Свечи, построенные на средних ценах: закрытие — среднее OHLC, открытие — середина предыдущей свечи. Это фильтр, а не реальные цены.",
+      pro: "Тренд виден без мелкого шума, серия свечей одного цвета хорошо держит позицию.",
+      con: "Нарисованная цена не совпадает с рыночной: стоп и тейк по ней ставить нельзя, входы запаздывают.",
+      who: "Трендовым системам и тем, кто пересиживает шум."
+    },
+    renko: {
+      kicker: "Только цена · шаг кирпича",
+      title: "Ренко",
+      what: "Новый «кирпич» появляется только после движения цены на фиксированный шаг. Время на оси отсутствует.",
+      pro: "Полностью убирает шум: мелкие колебания не рисуют ничего. Развороты видны структурно.",
+      con: "Нет времени и объёма, вход всегда с задержкой. Размер кирпича субъективен и меняет всю картину.",
+      who: "Свинг-трейдерам, которые ненавидят ложные срабатывания."
+    },
+    pnf: {
+      kicker: "Цена · шаг + разворот",
+      title: "Крестики-нолики",
+      what: "Столбцы из X (рост) и O (падение). Новый знак — при движении на шаг, новый столбец — только после разворота на заданное число шагов.",
+      pro: "Фильтр мелких движений, чистая структура поддержки-сопротивления, легко ставить цели по числу столбцов.",
+      con: "Нет времени, объёма и точной цены. Требует дисциплины в настройке шага.",
+      who: "Среднесрочным трейдерам и любителям классического теханализа."
+    },
+    profile: {
+      kicker: "Объём по уровням",
+      title: "Профиль объёма",
+      what: "Горизонтальная гистограмма: сколько объёма прошло на каждом ценовом уровне. Пик называют POC — точкой контроля.",
+      pro: "Показывает, где реально торговали и где у участников позиции. Уровни оборота работают как магниты.",
+      con: "Зависит от периода и качества данных. Требует опыта: без контекста это просто красивые полосы.",
+      who: "Тем, кто торгует от уровней и ищет зоны интереса крупных участников."
+    },
+    depth: {
+      kicker: "Заявки · мгновенный снимок",
+      title: "Глубина рынка",
+      what: "Накопленный объём заявок по обе стороны от текущей цены: слева биды, справа аски. Показывает, насколько рынок тонкий.",
+      pro: "Видно ликвидность и крупные заявки, помогает оценить проскальзывание до входа.",
+      con: "Снимок живёт секунды, заявки выставляют и снимают. Крупный «столб» часто оказывается приманкой.",
+      who: "Скальперам и тем, кто торгует большим для своего счёта объёмом."
+    }
+  };
+
+  var chart = window.Charts.mount(cv, "candles", data);
+
+  function apply(type) {
+    var m = META[type];
+    if (!m) return;
+    tabs.forEach(function (t) {
+      var on = t.dataset.type === type;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+    });
+    panel.setAttribute("aria-labelledby", "tab-" + type);
+    elKicker.textContent = m.kicker;
+    elTitle.textContent = m.title;
+    elWhat.textContent = m.what;
+    elPro.textContent = m.pro;
+    elCon.textContent = m.con;
+    elWho.textContent = m.who;
+    var label = "Учебный график: " + m.title.toLowerCase();
+    cv.setAttribute("aria-label", label);
+    chart.setType(type);
+  }
+
+  tabs.forEach(function (t) {
+    t.tabIndex = t.getAttribute("aria-selected") === "true" ? 0 : -1;
+    t.addEventListener("click", function () { apply(t.dataset.type); });
+    t.addEventListener("keydown", function (e) {
+      var i = tabs.indexOf(t), next = null;
+      if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
+      if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === "Home") next = tabs[0];
+      if (e.key === "End") next = tabs[tabs.length - 1];
+      if (next) {
+        e.preventDefault();
+        next.focus();
+        apply(next.dataset.type);
+      }
+    });
+  });
+
+  apply("candles");
+})();
+</script>
+</body>
+</html>

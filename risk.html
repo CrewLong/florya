@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Риск и размер позиции — ТИК</title>
+<meta name="description" content="Управление риском в трейдинге: правило 1–2%, R-мультипликатор, калькулятор размера позиции, математика просадки, серии убытков, журнал сделок и тильт.">
+<meta name="theme-color" content="#090C10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090C10'/%3E%3Crect x='7' y='10' width='3' height='14' fill='%233FBF8F'/%3E%3Crect x='14' y='5' width='3' height='21' fill='%23F0614E'/%3E%3Crect x='21' y='13' width='3' height='12' fill='%233FBF8F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="index.html">
+      <svg class="brand-mark" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="none" stroke="#2B3947"/><rect x="3.5" y="7" width="2.2" height="9" fill="#3FBF8F"/><rect x="9" y="3" width="2.2" height="14" fill="#F0614E"/><rect x="14.3" y="9" width="2.2" height="8" fill="#3FBF8F"/></svg>
+      <span>ТИК<small>трейдинг без иллюзий</small></span>
+    </a>
+    <nav class="nav" aria-label="Разделы сайта">
+      <a href="index.html">Обзор</a>
+      <a href="osnovy.html">Основы</a>
+      <a href="grafiki.html">Графики</a>
+      <a href="risk.html" aria-current="page">Риск</a>
+      <a href="start.html">Старт</a>
+      <a href="realnost.html">Честно</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Глава 3 · то, что реально решает исход</p>
+      <h1>Выживает не тот, кто угадал, <span class="soft">а тот, кто мало потерял</span></h1>
+      <p class="lede">Трейдеры разоряются не из-за плохого прогноза, а из-за слишком большой позиции. Этот раздел — про арифметику: сколько денег ставить, где ставить стоп и почему серия из пяти убытков — норма, а не повод менять стратегию.</p>
+      <div class="head-meta">
+        <span><i class="dot"></i>калькулятор позиции</span>
+        <span><i class="dot amber"></i>таблица просадок</span>
+        <span><i class="dot red"></i>математика без утешений</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="calc rv" aria-labelledby="calc-title">
+      <div>
+        <h2 id="calc-title" style="font-size:1.2rem;margin-bottom:16px">Калькулятор размера позиции</h2>
+        <div class="calc-fields">
+          <div class="field">
+            <label for="dep">Депозит, ₽</label>
+            <input id="dep" type="number" value="100000" min="0" step="1000" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="riskpct">Риск на сделку, %</label>
+            <input id="riskpct" type="number" value="1" min="0.1" max="10" step="0.1" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="entry">Цена входа</label>
+            <input id="entry" type="number" value="250" min="0" step="0.01" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="stop">Стоп-лосс</label>
+            <input id="stop" type="number" value="244" min="0" step="0.01" inputmode="decimal">
+          </div>
+        </div>
+        <p class="small" style="margin:14px 0 0">Объём считается так: риск в деньгах делится на расстояние до стопа. Плечо не участвует в расчёте — оно лишь позволяет уместить позицию в счёт.</p>
+      </div>
+      <div class="calc-out" aria-live="polite">
+        <span class="lbl">Размер позиции</span>
+        <span class="big" id="out-units">—</span>
+        <span class="sub" id="out-sub">шт. · стоимость — ₽</span>
+        <span class="sub" id="out-risk">Риск в деньгах: —</span>
+        <span class="err" id="out-err" role="alert"></span>
+      </div>
+    </section>
+    <p class="small">Калькулятор не учитывает комиссии и проскальзывание — добавьте к риску 10–20% запаса. Он ничего не советует по инструментам, только считает арифметику.</p>
+  </div>
+
+  <div class="wrap split">
+    <aside class="rail" aria-label="Содержание страницы">
+      <div class="rail-inner">
+        <p class="rail-title">На этой странице</p>
+        <a href="#poryadok">Порядок решений</a>
+        <a href="#procent">Правило 1–2%</a>
+        <a href="#r">R-мультипликатор</a>
+        <a href="#drawdown">Математика просадки</a>
+        <a href="#serii">Серии убытков</a>
+        <a href="#zhurnal">Журнал сделок</a>
+        <a href="#psiho">Тильт и психология</a>
+        <a href="#checklist">Чек-лист входа</a>
+      </div>
+    </aside>
+
+    <main>
+      <section class="block rv" id="poryadok">
+        <p class="section-note">01 · последовательность</p>
+        <h2>Правильный порядок решений</h2>
+        <p>Новичок сначала решает, <em>что</em> купить, а потом думает, сколько. Профессионал делает наоборот: сначала определяет допустимый убыток, из него выводит размер позиции, и только затем смотрит на инструмент. Разница в порядке — разница между счётом, который живёт годы, и счётом, который живёт месяц.</p>
+
+        <ul class="steps">
+          <li><h3>Сколько я готов потерять в этой сделке</h3><p>Фиксированная доля счёта, например 1%. Не «сколько не жалко», а конкретная сумма, посчитанная заранее.</p></li>
+          <li><h3>Где идея перестаёт быть верной</h3><p>Уровень стопа определяется структурой рынка, а не удобством. Если стоп получается слишком далеко — сделка пропускается, а не растягивается.</p></li>
+          <li><h3>Какой объём соответствует этому расстоянию</h3><p>Депозит × риск% ÷ расстояние до стопа. Это единственная формула, которую нужно знать наизусть.</p></li>
+          <li><h3>Сколько я хочу заработать и стоит ли оно того</h3><p>Цель должна быть минимум в два раза дальше стопа. Иначе издержки и винрейт съедят преимущество.</p></li>
+        </ul>
+      </section>
+
+      <section class="block rv" id="procent">
+        <p class="section-note">02 · базовое правило</p>
+        <h2>Правило 1–2% и почему не больше</h2>
+        <p>Риск на одну сделку в 1% означает: даже десять убытков подряд стоят около 10% счёта. При риске 10% те же десять сделок означают потерю 65% капитала — и дальше нужен рост на 186%, чтобы просто вернуться к нулю.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Риск на сделку</th><th>10 убытков подряд</th><th>Остаток счёта</th><th>Нужно, чтобы вернуться к 100%</th></tr></thead>
+            <tbody>
+              <tr><td class="n">0,5%</td><td class="n">−4,9%</td><td class="n">95,1%</td><td class="n up">+5,1%</td></tr>
+              <tr><td class="n">1%</td><td class="n">−9,6%</td><td class="n">90,4%</td><td class="n up">+10,6%</td></tr>
+              <tr><td class="n">2%</td><td class="n">−18,3%</td><td class="n">81,7%</td><td class="n up">+22,4%</td></tr>
+              <tr><td class="n">5%</td><td class="n">−40,1%</td><td class="n">59,9%</td><td class="n down">+67,0%</td></tr>
+              <tr><td class="n">10%</td><td class="n">−65,1%</td><td class="n">34,9%</td><td class="n down">+186,6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">Серия из десяти убытков при винрейте 45% — редкое, но вполне ожидаемое событие на горизонте нескольких сотен сделок.</p>
+
+        <div class="callout warn">
+          <span class="lbl">Асимметрия</span>
+          <p>Убыток и прибыль неравноправны: −50% требует +100%, −80% требует +400%. Поэтому ограничение убытка важнее поиска прибыли — это единственная часть уравнения, которой вы управляете полностью.</p>
+        </div>
+      </section>
+
+      <section class="block rv" id="r">
+        <p class="section-note">03 · единица измерения</p>
+        <h2>R-мультипликатор: считать в рисках, а не в рублях</h2>
+        <p>R — это ваш риск в одной сделке. Если риск 1 000 ₽, то прибыль 2 500 ₽ — это +2,5R, а убыток по стопу — −1R. Перевод результата в R убирает привязку к размеру счёта и делает статистику сравнимой.</p>
+        <p>Формула ожидания: <span class="mono">E = винрейт × средняя прибыль − проигрыш × средний убыток</span>. При винрейте 40% и соотношении 2:1 ожидание положительное: 0,4 × 2 − 0,6 × 1 = +0,2R на сделку.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Винрейт</th><th>Нужное соотношение прибыль/риск</th><th>Ожидание на сделку</th><th>Комментарий</th></tr></thead>
+            <tbody>
+              <tr><td class="n">30%</td><td class="n">2,4 : 1</td><td class="n up">+0,02R</td><td>Работает только на крупных трендах</td></tr>
+              <tr><td class="n">40%</td><td class="n">1,5 : 1</td><td class="n up">+0,00R</td><td>Порог безубыточности</td></tr>
+              <tr><td class="n">50%</td><td class="n">1 : 1</td><td class="n up">+0,00R</td><td>Порог безубыточности</td></tr>
+              <tr><td class="n">55%</td><td class="n">1 : 1</td><td class="n up">+0,10R</td><td>Слабое, но рабочее преимущество</td></tr>
+              <tr><td class="n">40%</td><td class="n">3 : 1</td><td class="n up">+0,60R</td><td>Сильная модель, редкие входы</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Практический вывод: не пытайтесь одновременно повысить винрейт и растянуть прибыль. Обычно стратегия улучшает одно за счёт другого, а зарабатывает на разнице.</p>
+      </section>
+
+      <section class="block rv" id="drawdown">
+        <p class="section-note">04 · просадка</p>
+        <h2>Математика просадки</h2>
+        <p>Просадка считается от максимума счёта, а не от первоначального депозита. Восстановление всегда требует большего процента, чем потеря, — и чем глубже яма, тем круче стена.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Просадка</th><th>Остаток от пика</th><th>Нужный рост для восстановления</th><th>Сколько сделок по +1R при риске 1%</th></tr></thead>
+            <tbody>
+              <tr><td class="n down">−10%</td><td class="n">90%</td><td class="n">+11,1%</td><td class="n">≈ 12</td></tr>
+              <tr><td class="n down">−20%</td><td class="n">80%</td><td class="n">+25,0%</td><td class="n">≈ 29</td></tr>
+              <tr><td class="n down">−30%</td><td class="n">70%</td><td class="n">+42,9%</td><td class="n">≈ 52</td></tr>
+              <tr><td class="n down">−50%</td><td class="n">50%</td><td class="n down">+100%</td><td class="n">≈ 139</td></tr>
+              <tr><td class="n down">−70%</td><td class="n">30%</td><td class="n down">+233%</td><td class="n">≈ 400</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">Расчёт при риске 1% на сделку и прибыли 1R: восстановление требует тем больше сделок, чем глубже просадка, потому что база уменьшилась.</p>
+      </section>
+
+      <section class="block rv" id="serii">
+        <p class="section-note">05 · статистика</p>
+        <h2>Серии убытков неизбежны</h2>
+        <p>При винрейте 45% вероятность убытка в отдельной сделке — 55%. Вероятность пяти убытков подряд — около 5%, то есть примерно раз на двадцать попыток. На сотне сделок самая длинная серия обычно составляет 6–8 убытков. Это не «сломанная стратегия», это нормальное распределение.</p>
+
+        <div class="grid c3">
+          <div class="cell num"><span class="tag">3 подряд</span><h3>~17%</h3><p>Случается регулярно, примерно раз в шесть серий по три сделки.</p></div>
+          <div class="cell num"><span class="tag">5 подряд</span><h3>~5%</h3><p>Психологически ощущается как катастрофа, статистически — рутина.</p></div>
+          <div class="cell num"><span class="tag">8 подряд</span><h3>~0,8%</h3><p>Редко, но на дистанции 500 сделок почти наверняка случится.</p></div>
+        </div>
+
+        <div class="callout">
+          <span class="lbl">Что делать с серией</span>
+          <p>Заранее опишите правило: после N убытков подряд размер риска снижается вдвое, после M — торговля останавливается до следующего дня. Правило, придуманное в спокойном состоянии, спасает в эмоциональном.</p>
+        </div>
+      </section>
+
+      <section class="block rv" id="zhurnal">
+        <p class="section-note">06 · измерение</p>
+        <h2>Журнал сделок: единственный источник правды</h2>
+        <p>Без журнала вы помните удачные сделки и забываете случайные. Через три месяца память расходится с реальностью на десятки процентов — и любое обучение превращается в самообман.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Поле</th><th>Зачем</th></tr></thead>
+            <tbody>
+              <tr><td>Дата, инструмент, направление</td><td>Идентификация и фильтрация статистики</td></tr>
+              <tr><td>Причина входа (по какому правилу)</td><td>Отделяет систему от импульса</td></tr>
+              <tr><td>Цена входа, стоп, цель</td><td>Проверка соблюдения плана</td></tr>
+              <tr><td>Объём и риск в ₽ / %</td><td>Контроль правила 1–2%</td></tr>
+              <tr><td>Результат в R</td><td>Сравнение сделок разного размера</td></tr>
+              <tr><td>Соблюдение плана: да / нет</td><td>Главная метрика новичка</td></tr>
+              <tr><td>Эмоция до и после</td><td>Поиск триггеров тильта</td></tr>
+              <tr><td>Скриншот входа и выхода</td><td>Разбор без искажений памяти</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Ключевая метрика первых месяцев — не прибыль, а <strong>доля сделок, выполненных по правилам</strong>. 90% соблюдения плана при нулевом результате — хороший прогресс. 40% при случайной прибыли — плохой.</p>
+      </section>
+
+      <section class="block rv" id="psiho">
+        <p class="section-note">07 · поведение</p>
+        <h2>Тильт: когда управление риском отключается</h2>
+        <p>Тильт — не слабость характера, а предсказуемая реакция на потерю. Мозг воспринимает убыток как угрозу и требует немедленно «отыграться», увеличивая ставку. Именно в этом состоянии совершается большинство катастрофических сделок.</p>
+
+        <div class="grid c2">
+          <div class="cell"><span class="tag">Симптом</span><h3>Revenge trading</h3><p>Сразу после стопа — новая сделка тем же объёмом или больше, без анализа. Лечится правилом паузы: 30 минут или до следующего дня.</p></div>
+          <div class="cell"><span class="tag">Симптом</span><h3>FOMO</h3><p>Вход на вершине движения из страха упустить. Лечится списком условий входа: если условие не выполнено, сделки нет, даже если «улетает».</p></div>
+          <div class="cell"><span class="tag">Симптом</span><h3>Сдвиг стопа</h3><p>«Дам ещё немного места». Один сдвиг обесценивает всю систему: статистика считалась при другом риске.</p></div>
+          <div class="cell"><span class="tag">Симптом</span><h3>Усреднение убытка</h3><p>Покупка ещё «по лучшей цене» превращает ограниченный риск в неограниченный. Самая частая причина обнуления счёта.</p></div>
+        </div>
+
+        <p>Работающая практика: перед сессией — три строки в журнал (план, лимит сделок, лимит убытка на день); после сессии — три строки разбора. Это дешевле, чем ещё один курс по психологии.</p>
+      </section>
+
+      <section class="block rv" id="checklist">
+        <p class="section-note">08 · протокол</p>
+        <h2>Чек-лист перед каждым входом</h2>
+        <ul>
+          <li>Риск по этой сделке не превышает 1–2% счёта — посчитан, а не «на глаз».</li>
+          <li>Стоп стоит по структуре рынка и уже выставлен заявкой, а не в голове.</li>
+          <li>Соотношение прибыли к риску не меньше 2:1 до издержек.</li>
+          <li>Вход соответствует заранее записанному правилу, а не «нравится график».</li>
+          <li>Дневной лимит убытка не исчерпан, лимит сделок не превышен.</li>
+          <li>Нет важной новости в ближайшие 15 минут (если стратегия не новостная).</li>
+          <li>Я в состоянии, в котором готов принять убыток без попытки отыграться.</li>
+        </ul>
+        <div class="callout ok">
+          <span class="lbl">Если хотя бы один пункт — «нет»</span>
+          <p>Сделки нет. Пропущенная прибыль не стоит ничего, кроме упущенной прибыли. Реализованный незапланированный убыток стоит денег и доверия к собственной системе.</p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Навигация между разделами">
+        <a href="grafiki.html"><span class="dir">Назад</span><span class="who">Глава 2 — Графики</span></a>
+        <a class="right" href="start.html"><span class="dir">Дальше</span><span class="who">Глава 4 — Как начинать</span></a>
+      </nav>
+    </main>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>ТИК</h4>
+        <p>Учебный проект о том, как устроен трейдинг и чего он стоит на самом деле. Без сигналов, партнёрских ссылок и обещаний доходности.</p>
+      </div>
+      <div>
+        <h4>Разделы</h4>
+        <ul>
+          <li><a href="index.html">Обзор</a></li>
+          <li><a href="osnovy.html">Основы рынка</a></li>
+          <li><a href="grafiki.html">Типы графиков</a></li>
+          <li><a href="start.html">Как начинать</a></li>
+          <li><a href="realnost.html">Стоит ли лезть</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Важно</h4>
+        <p>Расчёты приведены как учебные примеры. Материалы не являются инвестиционной рекомендацией.</p>
+      </div>
+    </div>
+    <p class="foot-note">Калькулятор работает локально в браузере и не передаёт введённые значения никуда.</p>
+  </div>
+</footer>
+
+<script src="assets/charts.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var dep = document.getElementById("dep");
+  var riskpct = document.getElementById("riskpct");
+  var entry = document.getElementById("entry");
+  var stop = document.getElementById("stop");
+  var outUnits = document.getElementById("out-units");
+  var outSub = document.getElementById("out-sub");
+  var outRisk = document.getElementById("out-risk");
+  var outErr = document.getElementById("out-err");
+
+  var nf = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
+
+  function num(el) {
+    var v = parseFloat(String(el.value).replace(",", "."));
+    return isFinite(v) ? v : NaN;
+  }
+
+  function calc() {
+    var d = num(dep), rp = num(riskpct), e = num(entry), s = num(stop);
+    outErr.textContent = "";
+    if (!(d > 0) || !(rp > 0) || !(e > 0) || !(s > 0)) {
+      outUnits.textContent = "—";
+      outSub.textContent = "Заполните все четыре поля положительными числами";
+      outRisk.textContent = "Риск в деньгах: —";
+      return;
+    }
+    if (e === s) {
+      outUnits.textContent = "—";
+      outSub.textContent = "Цена входа и стоп совпадают";
+      outRisk.textContent = "Риск в деньгах: —";
+      outErr.textContent = "Расстояние до стопа равно нулю — размер позиции не определён.";
+      return;
+    }
+    var riskMoney = (d * rp) / 100;
+    var perUnit = Math.abs(e - s);
+    var units = riskMoney / perUnit;
+    var value = units * e;
+    outUnits.textContent = nf.format(Math.floor(units * 100) / 100) + " шт.";
+    outSub.textContent = "Стоимость позиции: " + nf.format(Math.round(value)) + " ₽ · " +
+      (value > d ? "требуется плечо ≈ " + nf.format(value / d) + "×" : "плечо не требуется");
+    outRisk.textContent = "Риск в деньгах: " + nf.format(Math.round(riskMoney)) + " ₽ · " +
+      nf.format(Math.round(((e - s) / e) * 10000) / 100) + "% хода до стопа";
+  }
+
+  [dep, riskpct, entry, stop].forEach(function (el) {
+    el.addEventListener("input", calc);
+    el.addEventListener("change", calc);
+  });
+  calc();
+})();
+</script>
+</body>
+</html>
